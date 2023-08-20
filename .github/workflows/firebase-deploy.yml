@@ -33,7 +33,7 @@ jobs:
       - name: Extract Firebase URL
         id: extract_url
         run: |
-          FIREBASE_HOSTING_URL=$(firebase hosting:channel:describe preview --project $FIREBASE_PROJECT --json | jq -r '.previewUrl')
+          FIREBASE_HOSTING_URL=$(firebase hosting:channel:describe preview --project react-git-ci-cd --json | jq -r '.previewUrl')
 
            # Output the URL for later use in the next step
            echo "FIREBASE_HOSTING_URL=$FIREBASE_HOSTING_URL" >> $GITHUB_ENV
