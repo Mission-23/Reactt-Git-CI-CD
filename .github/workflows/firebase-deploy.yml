@@ -33,9 +33,8 @@ jobs:
       - name: Extract Firebase URL
         id: extract_url
         run: |
-          FIREBASE_JSON=$(firebase hosting:channel:describe preview --json)
-          echo "FIREBASE_JSON: $FIREBASE_JSON"  # Add this line to see the JSON output
-          FIREBASE_URL=$(echo "$FIREBASE_JSON" | jq -r '.url')
-          echo "FIREBASE_URL: $FIREBASE_URL"  # Add this line to see the extracted URL
-          echo "FIREBASE_URL=$FIREBASE_URL" >> $GITHUB_ENV
+          FIREBASE_HOSTING_URL=$(firebase hosting:channel:describe preview --project $FIREBASE_PROJECT --json | jq -r '.previewUrl')
+
+           # Output the URL for later use in the next step
+           echo "FIREBASE_HOSTING_URL=$FIREBASE_HOSTING_URL" >> $GITHUB_ENV
         continue-on-error: true
