@@ -1,9 +1,10 @@
 name: Deploy to Firebase and Comment on Pull Request
 
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    types:
+      - opened
+      - synchronize
 
 jobs:
   build_and_deploy:
@@ -25,14 +26,17 @@ jobs:
         run: npm run build
 
       - name: Deploy to Firebase
+        id: deploy
         run: |
           npm install -g firebase-tools
           firebase deploy --project react-git-ci-cd --token ${{ secrets.FIREBASE_TOKEN }} --only hosting
 
           # Extract Firebase Hosting URL
           FIREBASE_URL=$(firebase hosting:channel:describe preview --json | jq -r '.url')
+          echo "FIREBASE_URL=$FIREBASE_URL" >> $GITHUB_ENV
 
       - name: Comment on Pull Request
+        if: steps.deploy.outcome == 'success'
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
