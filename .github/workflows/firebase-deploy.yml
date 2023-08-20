@@ -32,10 +32,10 @@ jobs:
       - name: Deploy to Firebase
         run: |
           npm install -g firebase-tools
-          firebase use --token ${{ secrets.FIREBASE_TOKEN }} --add react-git-ci-cd
+          firebase use --token ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }} --add react-git-ci-cd
           firebase hosting:channel:deploy ${{ steps.subdomain.outputs.id }} --only hosting
 
-      - name: Comment on Pull Request
+        # - name: Comment on Pull Request
         uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
