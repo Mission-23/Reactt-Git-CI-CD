@@ -27,7 +27,7 @@ jobs:
 
       - name: Determine PR-specific subdomain
         id: subdomain
-        run: echo "pr-$GITHUB_REF" | tr / -
+        run: echo "pr-${{ github.event.pull_request.number }}" | tr / -
 
       - name: Deploy to Firebase
         run: |
@@ -41,7 +41,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const prNumber = context.payload.pull_request.number;
-            const subdomain = process.env.SUBDOMAIN; // The subdomain generated earlier
+            const subdomain = context.workflowRun.steps['Determine PR-specific subdomain'].outputs.id;
             const firebaseUrl = `https://${subdomain}.web.app`;
 
             const comment = `The deployed Firebase Hosting URL: ${firebaseUrl}`;
