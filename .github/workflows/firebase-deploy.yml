@@ -25,16 +25,29 @@ jobs:
       - name: Build the React app
         run: npm run build
 
+      - name: Determine PR-specific subdomain
+        id: subdomain
+        run: echo "pr-$GITHUB_REF" | tr / -
+
       - name: Deploy to Firebase
         run: |
           npm install -g firebase-tools
-          firebase deploy --project react-git-ci-cd --token ${{ secrets.FIREBASE_TOKEN }}
+          firebase use --token ${{ secrets.FIREBASE_TOKEN }} --add react-git-ci-cd
+          firebase hosting:channel:deploy ${{ steps.subdomain.outputs.id }} --only hosting
 
-      - name: Extract Firebase URL
-        id: extract_url
-        run: |
-          FIREBASE_HOSTING_URL=$(firebase hosting:channel:describe preview --project react-git-ci-cd --json | jq -r '.previewUrl')
+      - name: Comment on Pull Request
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const subdomain = process.env.SUBDOMAIN; // The subdomain generated earlier
+            const firebaseUrl = `https://${subdomain}.web.app`;
 
-           # Output the URL for later use in the next step
-           echo "FIREBASE_HOSTING_URL=$FIREBASE_HOSTING_URL" >> $GITHUB_ENV
-        continue-on-error: true
+            const comment = `The deployed Firebase Hosting URL: ${firebaseUrl}`;
+            github.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
