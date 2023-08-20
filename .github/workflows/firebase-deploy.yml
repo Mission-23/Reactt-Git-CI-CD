@@ -39,5 +39,5 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: $HOME/firebase-auth.json
         run: |
-          firebase use --add <your-firebase-project-id>
+          firebase use --add react-git-ci-cd
           firebase hosting:channel:deploy ${{ steps.subdomain.outputs.id }} --only hosting
